@@ -16,6 +16,7 @@ import apiClient from "../apiClient";
  */
 type Promo = {
   id: number;
+  type: "standard" | "infographic";
   title: string;
   subtitle: string | null;
   image: string | null;
@@ -117,8 +118,40 @@ export default function FullScreenPromoOverlay() {
 
   if (!promo) return null;
 
-  const gridEntries = isFlatGrid(promo.content_json) ? Object.entries(promo.content_json) : [];
+  const isInfographic = promo.type === "infographic";
+  const gridEntries = !isInfographic && isFlatGrid(promo.content_json) ? Object.entries(promo.content_json) : [];
   const isExternalCta = /^https?:\/\//i.test(promo.cta_link);
+
+  // Infographic promos have no card chrome — just the raw image floating
+  // over the backdrop with a close button, no title/subtitle/CTA/grid.
+  if (isInfographic) {
+    return (
+      <Dialog open={open} onClose={dismiss} className="relative z-[60]">
+        <DialogBackdrop
+          transition
+          className="fixed inset-0 z-50 w-screen h-screen bg-black/75 backdrop-blur-md transition-opacity duration-200 ease-out data-closed:opacity-0 motion-reduce:transition-none"
+        />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 w-screen h-screen">
+          {promo.image && (
+            <DialogPanel
+              transition
+              className="relative max-w-lg transition duration-200 ease-out data-closed:scale-95 data-closed:opacity-0 motion-reduce:transform-none motion-reduce:transition-none"
+            >
+              <button
+                type="button"
+                onClick={dismiss}
+                aria-label="Close"
+                className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-gray-600 shadow transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
+              >
+                <XMarkIcon className="h-6 w-6" />
+              </button>
+              <img src={promo.image} alt="" className="block max-h-[85vh] w-full rounded-lg object-contain shadow-2xl" />
+            </DialogPanel>
+          )}
+        </div>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onClose={dismiss} className="relative z-[60]">
