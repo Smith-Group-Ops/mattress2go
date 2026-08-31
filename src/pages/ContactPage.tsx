@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import apiClient from '../apiClient';
 import { SITE_NAME, STORE_INFO } from '../constants';
 import Layout from '../Layout';
+import { fireConversion, ADS_LABELS } from '../lib/googleAds';
 
 const Contact = () => {
     const [firstName, setFirstName] = useState('');
@@ -68,6 +69,7 @@ const Contact = () => {
                 store_id: STORE_ID,
             });
 
+            fireConversion(ADS_LABELS.contact);
             setSuccessMessage('Your inquiry was submitted successfully. We will be in touch soon.');
             setFirstName('');
             setLastName('');

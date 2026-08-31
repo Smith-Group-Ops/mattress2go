@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import FullScreenPromoOverlay from './components/FullScreenPromoOverlay';
 import Home from './pages/Home';
@@ -8,8 +9,14 @@ import FinancingPage from './pages/FinancingPage';
 import ShopFurniturePage from './pages/ShopFurniturePage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import NotFoundPage from './pages/NotFoundPage';
+import { initGoogleAds, attachClickTracking } from './lib/googleAds';
 
 function App() {
+    useEffect(() => {
+        initGoogleAds();
+        return attachClickTracking();
+    }, []);
+
     return (
         <>
         <FullScreenPromoOverlay />
