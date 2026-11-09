@@ -51,7 +51,7 @@ const Footer = () => {
         return (
             <li key={item.label}>
                 {item.href.startsWith('http') || item.href.startsWith('mailto') || item.href.startsWith('tel') ? (
-                    <a href={item.href} className="text-sm leading-6 text-gray-600 hover:text-gray-900">
+                    <a href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined} className="text-sm leading-6 text-gray-600 hover:text-gray-900">
                         {item.label}
                     </a>
                 ) : (
