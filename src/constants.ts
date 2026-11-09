@@ -165,8 +165,8 @@ export const FOOTER_LINKS: FooterSection[] = [
       { label: "Contact", href: "/contact" },
       // { label: "Visit Us", href: "/visit-us" },
       { label: "Financing", href: "/financing" },
-      { label: "Privacy Policy", href: "https://mattressmagicaz.com/privacy-policy" },
-      { label: "Terms", href: "https://mattressmagicaz.com/terms" },
+      { label: "Privacy Policy", href: "/privacy-policy" },
+      { label: "Terms & Conditions", href: "/terms" },
     ],
   },
   {
