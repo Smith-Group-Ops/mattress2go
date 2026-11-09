@@ -10,6 +10,7 @@ const Contact = () => {
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [message, setMessage] = useState('');
+    const [consent, setConsent] = useState(false);
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -17,6 +18,11 @@ const Contact = () => {
 
     const RECAPTCHA_SITE_KEY = import.meta.env.VITE_APP_RECAPTCHA_SITE_KEY as string;
     const STORE_ID = Number(import.meta.env.VITE_APP_STORE_ID ?? 0);
+    const TEXT_NUMBER = ((import.meta.env.VITE_APP_TEXT_NUMBER as string | undefined) ?? '').trim();
+    const textDigits = TEXT_NUMBER.replace(/\D/g, '');
+    const textHref = textDigits
+        ? `sms:+${textDigits.length === 10 ? '1' : ''}${textDigits}?&body=${encodeURIComponent(`Hi ${SITE_NAME}, I have a question.`)}`
+        : null;
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -25,6 +31,11 @@ const Contact = () => {
 
         if (!firstName.trim() || !lastName.trim() || !email.trim() || !phone.trim() || !message.trim()) {
             setErrorMessage('Please complete all fields before sending your inquiry.');
+            return;
+        }
+
+        if (!consent) {
+            setErrorMessage('Please agree to receive text messages so we can reply to you.');
             return;
         }
 
@@ -67,15 +78,17 @@ const Contact = () => {
                 message: message.trim(),
                 recaptcha_token: recaptchaToken,
                 store_id: STORE_ID,
+                sms_consent: true,
             });
 
             fireConversion(ADS_LABELS.contact);
-            setSuccessMessage('Your inquiry was submitted successfully. We will be in touch soon.');
+            setSuccessMessage('Your message was sent. We will reply by text message soon.');
             setFirstName('');
             setLastName('');
             setEmail('');
             setPhone('');
             setMessage('');
+            setConsent(false);
         } catch (error: any) {
             const serverMessage = error?.response?.data?.message || 'Unable to submit your inquiry. Please try again later.';
             setErrorMessage(serverMessage);
@@ -151,9 +164,8 @@ const Contact = () => {
                             <span className='text-base font-semibold leading-7 text-copa-blue-700'>Contact us</span>
                             <h2 className='mt-2 text-3xl font-bold tracking-tight text-gray-900'>Get in touch</h2>
                             <p className='mt-6 text-lg leading-8 text-gray-600'>
-                                Have a question about {SITE_NAME}? Feel free to visit us or get in
-                                touch with our contact information below or use the form to message
-                                the store directly.
+                                Have a question about {SITE_NAME}? Feel free to visit us, text us, or
+                                use the form to message the store directly. We reply by text message.
                             </p>
                             <dl className='mt-10 space-y-4 text-base leading-7 text-gray-600'>
                                 <div className='flex items-center gap-x-4'>
@@ -204,6 +216,34 @@ const Contact = () => {
                                         </a>
                                     </dd>
                                 </div>
+                                {textHref && (
+                                    <div className='flex items-center gap-x-4'>
+                                        <dt className='flex-none'>
+                                            <span className='sr-only'>Text us</span>
+                                            <span className='flex h-10 w-10 items-center justify-center rounded-lg bg-copa-blue-50 text-copa-blue-700'>
+                                                <svg
+                                                    className='h-6 w-6'
+                                                    fill='none'
+                                                    viewBox='0 0 24 24'
+                                                    strokeWidth='1.5'
+                                                    stroke='currentColor'
+                                                    aria-hidden='true'
+                                                >
+                                                    <path
+                                                        strokeLinecap='round'
+                                                        strokeLinejoin='round'
+                                                        d='M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 0 1 1.037-.443 48.282 48.282 0 0 0 5.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z'
+                                                    ></path>
+                                                </svg>
+                                            </span>
+                                        </dt>
+                                        <dd>
+                                            <a className='font-semibold text-copa-blue-700 hover:text-copa-blue-800' href={textHref}>
+                                                Text us at {TEXT_NUMBER}
+                                            </a>
+                                        </dd>
+                                    </div>
+                                )}
                                 <div className='flex items-center gap-x-4'>
                                     <dt className='flex-none'>
                                         <span className='sr-only'>Email</span>
@@ -339,6 +379,21 @@ const Contact = () => {
                                                 />
                                             </div>
                                         </div>
+                                    </div>
+                                    <div className='flex items-start gap-x-3'>
+                                        <input
+                                            type='checkbox'
+                                            name='sms-consent'
+                                            id='sms-consent'
+                                            checked={consent}
+                                            onChange={(event) => setConsent(event.target.checked)}
+                                            className='mt-1 h-4 w-4 rounded border-gray-300 text-copa-blue-700 focus:ring-copa-blue-600'
+                                        />
+                                        <label htmlFor='sms-consent' className='text-xs leading-5 text-gray-600'>
+                                            I agree to receive text messages from {SITE_NAME} about my inquiry at the
+                                            phone number above. Message and data rates may apply. Reply STOP to opt out.
+                                            See our <a className='underline hover:text-gray-900' href='/privacy-policy'>Privacy Policy</a>.
+                                        </label>
                                     </div>
                                     <div className='mt-8 flex justify-end'>
                                         <button
