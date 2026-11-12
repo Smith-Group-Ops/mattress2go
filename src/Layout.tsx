@@ -3,6 +3,7 @@ import HeaderNav from './components/HeaderNav';
 import Footer from './components/Footer';
 import { SITE_NAME, DESCRIPTION } from './constants';
 import CallButton from './components/CallButton';
+import PromoPopup from './components/PromoPopup';
 
 interface LayoutProps {
     title: string;
@@ -25,6 +26,7 @@ const Layout: React.FC<LayoutProps> = ({ title, children }) => {
                 {children}
             </main>
             <CallButton />
+            <PromoPopup />
             <Footer />
         </div>
     );
