@@ -46,6 +46,7 @@ export const ADS_LABELS = {
     phone: import.meta.env.VITE_GOOGLE_ADS_LABEL_PHONE as string | undefined,
     directions: import.meta.env.VITE_GOOGLE_ADS_LABEL_DIRECTIONS as string | undefined,
     contact: import.meta.env.VITE_GOOGLE_ADS_LABEL_CONTACT as string | undefined,
+    promo: import.meta.env.VITE_GOOGLE_ADS_LABEL_PROMO as string | undefined,
 };
 
 /**
